@@ -35,7 +35,7 @@ def attempt_login(email, password, proxy, hits_file, local_hits_file):
 
 def process_combo_file(hits_file, local_hits_file, proxies):
     with open("combo.txt", "r") as file:
-        with ThreadPoolExecutor(max_workers=10) as executor:
+        with ThreadPoolExecutor(max_workers=50) as executor:
             futures = []
             for line in file:
                 email, password = validate_line(line)
